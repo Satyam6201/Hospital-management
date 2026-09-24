@@ -7,8 +7,7 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         System.out.println("=== Hospital Management System ===");
 
-        // Initialize Database
-        utils.DatabaseHelper.initializeDatabase();
+
 
         PatientService patientService = new PatientService();
         DoctorService doctorService = new DoctorService();
