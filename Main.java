@@ -1,13 +1,14 @@
-package HospitalManagementSystem;
-
-import HospitalManagementSystem.model.*;
-import HospitalManagementSystem.service.*;
+import model.*;
+import service.*;
 import java.util.*;
 
 public class Main {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         System.out.println("=== Hospital Management System ===");
+
+        // Initialize Database
+        utils.DatabaseHelper.initializeDatabase();
 
         PatientService patientService = new PatientService();
         DoctorService doctorService = new DoctorService();

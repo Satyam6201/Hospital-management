@@ -1,4 +1,4 @@
-package HospitalManagementSystem.model;
+package model;
 
 import java.util.List;
 
