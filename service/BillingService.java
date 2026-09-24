@@ -8,36 +8,42 @@ import model.Bill;
 import utils.DatabaseHelper;
 
 public class BillingService {
+    
+    // Flat consultation fee
+    private static final double CONSULTATION_FEE = 550.0;
+
     public Bill generateBill(Appointment appointment) {
-        double total = 550.0; // Flat fee for simplicity
-        Bill bill = new Bill(UUID.randomUUID().toString(), appointment.getPatient().getName(), appointment.getDoctor().getName(), total, false);
+        Bill bill = new Bill(UUID.randomUUID().toString(), appointment.getPatient().getName(), appointment.getDoctor().getName(), CONSULTATION_FEE, false);
+        String sql = "INSERT INTO bills(id, patient_name, doctor_name, total, is_paid) VALUES(?, ?, ?, ?, ?)";
 
         try (Connection conn = DatabaseHelper.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO bills(id, patient_name, doctor_name, total, is_paid) VALUES(?, ?, ?, ?, ?)")) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
             pstmt.setString(1, bill.getId());
             pstmt.setString(2, bill.getPatientName());
             pstmt.setString(3, bill.getDoctorName());
             pstmt.setDouble(4, bill.getTotalAmount());
             pstmt.setBoolean(5, bill.isPaid());
             pstmt.executeUpdate();
-        } catch (Exception e) {
-            System.err.println("Error generating bill: " + e.getMessage());
+            
+        } catch (Exception ignored) {
+            // Ignore for simple console app
         }
         return bill;
     }
 
-    public void processPayment(String billId) {
+    // Returns true if payment was processed successfully
+    public boolean processPayment(String billId) {
+        String sql = "UPDATE bills SET is_paid = true WHERE id = ?";
         try (Connection conn = DatabaseHelper.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement("UPDATE bills SET is_paid = true WHERE id = ?")) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
             pstmt.setString(1, billId);
             int updated = pstmt.executeUpdate();
-            if (updated > 0) {
-                System.out.println("[💰] Payment Successful for Bill ID: " + billId);
-            } else {
-                System.out.println("[!] Bill not found.");
-            }
+            return updated > 0;
+            
         } catch (Exception e) {
-            System.err.println("Error processing payment: " + e.getMessage());
+            return false;
         }
     }
 }
