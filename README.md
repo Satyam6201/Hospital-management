@@ -1,90 +1,87 @@
-# Hospital Management System 🏥
+# 🏥 Hospital Management System
 
-Welcome to the **Hospital Management System**! This is a straightforward, beginner-friendly Java application that runs right in your terminal. It helps manage the basic day-to-day operations of a hospital without needing any complicated database setup or external installations. 
+Welcome to the **Hospital Management System**! This is a simple, easy-to-read Java console application that helps manage a hospital's daily tasks. It uses a **MySQL Database** to securely save all your data, so you never lose your history even after you close the app!
 
-Everything runs in-memory, meaning all the data is saved temporarily while the application is running, making it super easy to test and use!
+---
+
+## ✨ What Can This App Do?
+
+This system automates the most important hospital tasks:
+1. **Registers Patients:** Safely stores patient details, ages, and their current symptoms.
+2. **Smart Doctor Matching:** If you type a symptom like "foot pain", the system automatically finds the Orthopedic doctor and books the next available time slot!
+3. **Generates Bills:** Creates a final receipt combining consultation and service fees.
+4. **Processes Payments:** Directly asks the user if they want to pay the bill right now and instantly updates the database status to 'Paid'.
 
 ---
 
 ## 🛠️ How It Works (Project Flow)
 
-Here is a simple flow diagram showing how the different parts of the application work together:
+Here is a visual flow diagram showing how the different parts of the application talk to each other and the database:
 
 ```mermaid
 flowchart TD
     User([User in Terminal]) --> Main(Main.java)
     
     Main -->|1. Enters Patient Info| PS[PatientService]
-    PS -->|Saves Patient| DB[(DataStore / Memory)]
+    PS -->|Saves to MySQL| DB[(MySQL Database)]
     
     Main -->|2. Requests Appointment| AS[AppointmentService]
-    
-    AS -->|Checks for available doctors| DS[DoctorService]
+    AS -->|Finds available doctor| DS[DoctorService]
     DS -.->|Fetches Doctors| DB
-    
     AS -->|Books Slot| DB
     
-    Main -->|3. Generates Receipt| BS[BillingService]
+    Main -->|3. Generates Bill| BS[BillingService]
     BS -->|Calculates Fees| DB
+    
+    Main -->|4. Pays Bill| BS
+    BS -->|Updates Status to 'Paid'| DB
 ```
-
----
-
-## 📂 What's Inside? (Folder Structure)
-
-Here's how the code is organized:
-
-* **`model/`**: This folder contains the blueprints for our real-world objects.
-  * `Patient.java` - Holds patient details (Name, Age, Symptoms).
-  * `Doctor.java` - Holds doctor details (Name, Specialty, Available Time Slots).
-  * `Appointment.java` - Links a patient to a doctor at a specific time.
-  * `Bill.java` - Stores the final billing amounts.
-* **`service/`**: This folder contains the "brains" of the operation.
-  * `PatientService.java` - Handles registering new patients.
-  * `DoctorService.java` - Finds the right doctor based on the patient's symptoms.
-  * `AppointmentService.java` - Books the actual time slot.
-  * `BillingService.java` - Calculates the consultation fees and service charges.
-* **`utils/DataStore.java`**: This acts as our "Database". It uses simple Java Lists (`ArrayList`) to hold all our patients and doctors while the app is running.
-* **`Main.java`**: The starting point of our application where the user types in their inputs.
 
 ---
 
 ## 🚀 How to Run the App
 
-Because we removed all the complicated database requirements, running this is as easy as running any standard Java file.
+Because this app uses a real database, you just need to make sure MySQL is running on your computer. (The app automatically creates the database and all the tables for you on startup!)
 
-**Step 1: Compile the Code**  
-Open your terminal (in the project folder) and tell Java to compile all the files:
+**Step 1: Get the MySQL Driver**
+Make sure you have the `mysql-connector.jar` file in your project folder (which acts as a bridge between Java and MySQL).
+
+**Step 2: Compile the Code**  
+Open your terminal (PowerShell or Command Prompt) in the project folder and compile all the files:
 ```powershell
 javac Main.java model/*.java service/*.java utils/*.java
 ```
 
-**Step 2: Run the App**  
-Start the program by running:
+**Step 3: Run the App**  
+Start the program by running this command in your terminal so Java knows to use the MySQL bridge:
 ```powershell
-java Main
+java -cp ".;mysql-connector.jar" Main
 ```
 
-*(If you are using an IDE like VS Code, you can also just click the "Run" button on `Main.java`!)*
-
----
-
-## ✨ Features You Can Try
-- **Smart Doctor Match:** If you type "foot pain" as your symptom, the system is smart enough to find the Orthopedic doctor automatically!
-- **Automatic Billing:** The system automatically charges a standard consultation fee and service fee.
-- **Easy to Read Code:** The entire project is broken down into small, readable files so you can easily learn how Object-Oriented Programming (OOP) works in Java.
+*(If you are on a Mac/Linux machine, use `:` instead of `;` in the quotes).*
 
 ---
 
 ## 💻 Example of What You'll See
 
+Here is exactly what the app looks like when you run it in your terminal:
+
 ```text
 === Hospital Management System ===
 Enter Patient Name: Satyam
 Enter Age: 21
-Enter Symptom: foot pain
+Enter Symptom (e.g., foot pain, heart, kids): foot pain
 
 [✔] Appointment Booked!
-Doctor: Dr. Smith
+Doctor: Dr. Smith (Orthopedic)
 Slot: 10:00 AM
+
+--- Bill Generated ---
+Total Amount: $550.0
+Status: Pending
+
+Do you want to pay the bill now? (yes/no): yes
+[💰] Payment Successful for Bill ID: 52a12b7a-9c2b...
+
+Thank you for using the Hospital Management System.
 ```

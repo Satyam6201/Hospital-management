@@ -22,4 +22,3 @@ public class Patient {
         return id + "," + name + "," + age + "," + symptom;
     }
 }
-
